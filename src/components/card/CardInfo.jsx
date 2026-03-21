@@ -46,9 +46,17 @@ export function CardInfo({ word, showAnswer, onReveal }) {
           <div style={{ fontSize: 14, color: "#666" }}>{word.exMeaning}</div>
         </div>
   
-        {!showAnswer && (
-          <div style={{ fontSize: 12, color: "#ccc", marginTop: 10 }}>탭하면 정답 보기</div>
-        )}
+        <div
+          style={{
+            fontSize: 12,
+            color: "#ccc",
+            marginTop: 10,
+            minHeight: 18,
+            visibility: showAnswer ? "hidden" : "visible",
+          }}
+        >
+          탭하여 정답 보기
+        </div>
       </div>
     );
   }
