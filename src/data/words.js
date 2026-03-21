@@ -1,0 +1,23 @@
+// data/words.js
+export const INITIAL_WORDS = [
+    { id:1, hanzi:"放假", pinyin:"fàngjià", meaning:"휴가", example:"明天放假，我很高兴。", exPinyin:"Míngtiān fàngjià, wǒ hěn gāoxìng.", exMeaning:"내일 휴가라서 나는 매우 기쁘다." },
+    { id:2, hanzi:"旅游", pinyin:"lǚyóu", meaning:"여행", example:"我想去中国旅游。", exPinyin:"Wǒ xiǎng qù Zhōngguó lǚyóu.", exMeaning:"나는 중국에 여행 가고 싶다." },
+    { id:3, hanzi:"网上购物", pinyin:"wǎngshàng gòuwù", meaning:"온라인 쇼핑", example:"我经常网上购物。", exPinyin:"Wǒ jīngcháng wǎngshàng gòuwù.", exMeaning:"나는 자주 온라인 쇼핑을 한다." },
+    { id:4, hanzi:"网站", pinyin:"wǎngzhàn", meaning:"웹사이트", example:"这个网站很好用。", exPinyin:"Zhège wǎngzhàn hěn hǎoyòng.", exMeaning:"이 웹사이트는 사용하기 좋다." },
+    { id:5, hanzi:"小碗", pinyin:"xiǎowǎn", meaning:"앞접시", example:"请给我一个小碗。", exPinyin:"Qǐng gěi wǒ yí gè xiǎowǎn.", exMeaning:"작은 그릇 하나 주세요." },
+    { id:6, hanzi:"暑假", pinyin:"shǔjià", meaning:"여름휴가", example:"暑假你打算去哪儿？", exPinyin:"Shǔjià nǐ dǎsuàn qù nǎr?", exMeaning:"여름휴가에 어디 갈 계획이야?" },
+    { id:7, hanzi:"一会儿", pinyin:"yíhuìr", meaning:"잠시 후", example:"请等一会儿。", exPinyin:"Qǐng děng yíhuìr.", exMeaning:"잠시만 기다려 주세요." },
+    { id:8, hanzi:"再", pinyin:"zài", meaning:"다시", example:"请再说一次。", exPinyin:"Qǐng zài shuō yí cì.", exMeaning:"다시 한번 말해 주세요." },
+    { id:9, hanzi:"已经", pinyin:"yǐjīng", meaning:"이미", example:"我已经吃过了。", exPinyin:"Wǒ yǐjīng chīguò le.", exMeaning:"나는 이미 먹었다." },
+    { id:10, hanzi:"听说", pinyin:"tīngshuō", meaning:"듣자하니", example:"听说明天会下雨。", exPinyin:"Tīngshuō míngtiān huì xià yǔ.", exMeaning:"듣자하니 내일 비가 온대." },
+    { id:11, hanzi:"关门", pinyin:"guānmén", meaning:"닫다", example:"商店已经关门了。", exPinyin:"Shāngdiàn yǐjīng guānmén le.", exMeaning:"가게가 이미 문을 닫았다." },
+    { id:12, hanzi:"更", pinyin:"gèng", meaning:"더", example:"今天比昨天更冷。", exPinyin:"Jīntiān bǐ zuótiān gèng lěng.", exMeaning:"오늘은 어제보다 더 춥다." },
+    { id:13, hanzi:"约", pinyin:"yuē", meaning:"약속하다", example:"我约了朋友吃饭。", exPinyin:"Wǒ yuē le péngyou chīfàn.", exMeaning:"나는 친구와 밥 먹기로 약속했다." },
+    { id:14, hanzi:"忘记", pinyin:"wàngjì", meaning:"잊어버리다", example:"我忘记带手机了。", exPinyin:"Wǒ wàngjì dài shǒujī le.", exMeaning:"나는 핸드폰 가져오는 걸 잊어버렸다." },
+    { id:15, hanzi:"附近", pinyin:"fùjìn", meaning:"부근", example:"附近有咖啡店吗？", exPinyin:"Fùjìn yǒu kāfēidiàn ma?", exMeaning:"부근에 카페가 있나요?" },
+    { id:16, hanzi:"应该", pinyin:"yīnggāi", meaning:"마땅히", example:"你应该多休息。", exPinyin:"Nǐ yīnggāi duō xiūxi.", exMeaning:"너는 좀 더 쉬어야 해." },
+    { id:17, hanzi:"一整天", pinyin:"yìzhěngtiān", meaning:"하루 종일", example:"他一整天都在学习。", exPinyin:"Tā yìzhěngtiān dōu zài xuéxí.", exMeaning:"그는 하루 종일 공부했다." },
+    { id:18, hanzi:"所以", pinyin:"suǒyǐ", meaning:"그래서", example:"下雨了，所以我没去。", exPinyin:"Xià yǔ le, suǒyǐ wǒ méi qù.", exMeaning:"비가 와서, 그래서 나는 안 갔다." },
+    { id:19, hanzi:"告诉", pinyin:"gàosu", meaning:"알리다", example:"请告诉我你的电话号码。", exPinyin:"Qǐng gàosu wǒ nǐ de diànhuà hàomǎ.", exMeaning:"나에게 전화번호를 알려 주세요." },
+    { id:20, hanzi:"要不然", pinyin:"yàobùrán", meaning:"그렇지 않으면", example:"快走吧，要不然会迟到。", exPinyin:"Kuài zǒu ba, yàobùrán huì chídào.", exMeaning:"빨리 가자, 그렇지 않으면 늦을 거야." },
+  ];
