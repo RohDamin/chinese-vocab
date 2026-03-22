@@ -18,8 +18,6 @@ export default function App() {
     current,
     currentIdx,
     statuses,
-    showAnswer,
-    setShowAnswer,
     filter,
     view,
     loading,
@@ -100,8 +98,6 @@ export default function App() {
             filtered={filtered}
             current={current}
             currentIdx={currentIdx}
-            showAnswer={showAnswer}
-            setShowAnswer={setShowAnswer}
             animDir={animDir}
             statuses={statuses}
             filter={filter}

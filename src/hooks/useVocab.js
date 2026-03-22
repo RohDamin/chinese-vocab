@@ -14,7 +14,6 @@ export function useVocab() {
 
   // UI 상태
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
   const [filter, setFilter] = useState("all");
   const [view, setView] = useState("card");
   const [loading, setLoading] = useState(true);
@@ -43,7 +42,6 @@ export function useVocab() {
     setSelectedVocab(vocab);
     setLoading(true);
     setCurrentIdx(0);
-    setShowAnswer(false);
     setRandomSwipeActive(false);
     setFilter("all");
     setView("card");
@@ -95,7 +93,6 @@ export function useVocab() {
       const len = filtered.length;
       setAnimDir(dir);
       setTimeout(() => {
-        setShowAnswer(false);
         setCurrentIdx((i) => {
           if (randomSwipeRef.current && len > 1) {
             let j;
@@ -143,20 +140,17 @@ export function useVocab() {
   const changeFilter = useCallback((f) => {
     setFilter(f);
     setCurrentIdx(0);
-    setShowAnswer(false);
   }, []);
 
   const changeView = useCallback((v) => {
     setView(v);
     setCurrentIdx(0);
-    setShowAnswer(false);
   }, []);
 
   const goToCard = useCallback(
     (wordId) => {
       const idx = filtered.findIndex((f) => f.id === wordId);
       setCurrentIdx(idx >= 0 ? idx : 0);
-      setShowAnswer(false);
       setView("card");
     },
     [filtered]
@@ -186,8 +180,6 @@ export function useVocab() {
     current,
     currentIdx,
     statuses,
-    showAnswer,
-    setShowAnswer,
     filter,
     view,
     loading,

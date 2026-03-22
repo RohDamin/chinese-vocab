@@ -19,8 +19,6 @@ export default function FlashCard({
   filtered,
   current,
   currentIdx,
-  showAnswer,
-  setShowAnswer,
   animDir,
   statuses,
   filter,
@@ -33,21 +31,42 @@ export default function FlashCard({
   const swipeStartX = useRef(0);
   const swipeStartY = useRef(0);
   const [writePracticeActive, setWritePracticeActive] = useState(false);
-  /** 쓰기 모드에서 한자 블러 해제 여부 (false면 블러) */
+  /** true면 블러 대상이 뜻·예문뜻 쪽 (false면 한자·한자예문) */
+  const [meaningViewActive, setMeaningViewActive] = useState(false);
+  /** 현재 모드에서 블러 해제(엿보기) */
+  const [blurPeek, setBlurPeek] = useState(false);
   const [writeHanziRevealed, setWriteHanziRevealed] = useState(false);
+
+  const toggleBlurPeek = useCallback(() => setBlurPeek((v) => !v), []);
 
   const SWIPE_THRESHOLD = 56;
 
   const toggleWritePractice = useCallback(() => {
     setWritePracticeActive((v) => {
       const next = !v;
-      if (next) setShowAnswer(true);
+      if (next) {
+        setMeaningViewActive(false);
+        setBlurPeek(false);
+      }
       return next;
     });
-  }, [setShowAnswer]);
+  }, []);
+
+  const toggleMeaningView = useCallback(() => {
+    setMeaningViewActive((v) => {
+      const next = !v;
+      if (next) {
+        setWritePracticeActive(false);
+        setWriteHanziRevealed(false);
+      }
+      setBlurPeek(false);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     setWriteHanziRevealed(false);
+    setBlurPeek(false);
   }, [current?.id]);
 
   useEffect(() => {
@@ -163,7 +182,7 @@ export default function FlashCard({
             toggleWritePractice();
           }}
           onPointerDown={(e) => e.stopPropagation()}
-          title={writePracticeActive ? "한자쓰기 끄기" : "한자쓰기 (예문 자리에 필기)"}
+          title={writePracticeActive ? "한자쓰기 끄기" : "한자쓰기"}
           aria-label={writePracticeActive ? "한자쓰기 모드 끄기" : "한자쓰기 모드 켜기"}
           aria-pressed={writePracticeActive}
           style={{
@@ -183,6 +202,35 @@ export default function FlashCard({
         >
           <span style={{ fontSize: 14, lineHeight: 1 }}>
             {STATUS_LABELS.find((s) => s.field === "hanzi_written")?.emoji ?? "✏️"}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleMeaningView();
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          title={meaningViewActive ? "뜻 보기 모드 끄기" : "뜻 보기 모드"}
+          aria-label={meaningViewActive ? "뜻 보기 모드 끄기" : "뜻 보기 모드 켜기"}
+          aria-pressed={meaningViewActive}
+          style={{
+            width: 32,
+            height: 32,
+            padding: 0,
+            borderRadius: 10,
+            border: meaningViewActive ? `2px solid ${COLORS.green}` : `1px solid ${COLORS.border}`,
+            background: meaningViewActive ? COLORS.green : COLORS.white,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: meaningViewActive ? COLORS.white : COLORS.textMuted,
+            boxShadow: meaningViewActive ? "0 2px 6px rgba(46,160,90,.3)" : "0 1px 2px rgba(0,0,0,.06)",
+          }}
+        >
+          <span style={{ fontSize: 14, lineHeight: 1 }}>
+            {STATUS_LABELS.find((s) => s.field === "meaning_memorized")?.emoji ?? "📖"}
           </span>
         </button>
       </div>
@@ -221,12 +269,16 @@ export default function FlashCard({
             writeMode={writePracticeActive}
             writeHanziRevealed={writeHanziRevealed}
             onToggleWriteHanzi={() => setWriteHanziRevealed((v) => !v)}
+            meaningViewActive={meaningViewActive}
+            blurPeek={blurPeek}
+            onToggleBlurPeek={toggleBlurPeek}
           />
           <CardInfo
             word={current}
-            showAnswer={showAnswer}
-            onReveal={() => setShowAnswer(true)}
             writePracticeActive={writePracticeActive}
+            meaningViewActive={meaningViewActive}
+            blurPeek={blurPeek}
+            onToggleBlurPeek={toggleBlurPeek}
           />
         </div>
 

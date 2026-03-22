@@ -6,35 +6,57 @@ import { HandwritingPad } from "./HandwritingPad";
 /** 한자쓰기 슬롯 고정 높이 · 예문 영역 최대 높이 (px) */
 export const CARD_LOWER_SLOT_PX = 200;
 
-export function CardInfo({ word, showAnswer, onReveal, writePracticeActive = false }) {
-  const hidden = {
-    filter: "blur(8px)",
-    userSelect: "none",
-    cursor: "pointer",
-    transition: "filter .3s",
-  };
+const blurStyle = {
+  filter: "blur(8px)",
+  userSelect: "none",
+  cursor: "pointer",
+  transition: "filter .3s",
+};
 
-  const revealMeaning = showAnswer || writePracticeActive;
-  const revealExampleExtra = showAnswer || writePracticeActive;
+export function CardInfo({
+  word,
+  writePracticeActive = false,
+  /** true: 뜻·병음·예문해석 블러 / false: 한자·예문(한문) 블러 — 쓰기 모드 아닐 때만 */
+  meaningViewActive = false,
+  /** true면 현재 모드에서 블러 해제 */
+  blurPeek = false,
+  onToggleBlurPeek,
+}) {
+  const meaningSideBlurred = !writePracticeActive && meaningViewActive && !blurPeek;
+  const hanziSideBlurred = !writePracticeActive && !meaningViewActive && !blurPeek;
 
   return (
     <div style={{ padding: "16px 18px", textAlign: "center" }}>
       {/* 뜻 & 병음 */}
-      <div
-        style={revealMeaning ? {} : hidden}
-        onClick={() => !revealMeaning && onReveal()}
-      >
-        <div style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-          {word.meaning}
+      {writePracticeActive ? (
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>{word.meaning}</div>
+          <div style={{ fontSize: 14, color: "#999", marginBottom: 12 }}>{word.pinyin}</div>
         </div>
-        <div style={{ fontSize: 14, color: "#999", marginBottom: 12 }}>
-          {word.pinyin}
+      ) : meaningViewActive ? (
+        <div style={meaningSideBlurred ? blurStyle : {}} onClick={() => meaningViewActive && onToggleBlurPeek?.()}>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>{word.meaning}</div>
+          <div style={{ fontSize: 14, color: "#999", marginBottom: 12 }}>{word.pinyin}</div>
         </div>
-      </div>
+      ) : (
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>{word.meaning}</div>
+          <div
+            style={{
+              fontSize: 14,
+              color: "#999",
+              marginBottom: 12,
+              ...(hanziSideBlurred ? blurStyle : {}),
+            }}
+            onClick={() => hanziSideBlurred && onToggleBlurPeek?.()}
+          >
+            {word.pinyin}
+          </div>
+        </div>
+      )}
 
       <div style={{ height: 1, background: "#f0f0f0", margin: "0 0 10px" }} />
 
-      {/* 쓰기 모드: 고정 높이 슬롯 / 일반: 내용만큼만 (최대 동일 px, 아래 빈 여백 없음) */}
       {writePracticeActive ? (
         <div
           style={{
@@ -68,32 +90,64 @@ export function CardInfo({ word, showAnswer, onReveal, writePracticeActive = fal
           >
             예 문
           </div>
+
+          {/* 한자 예문 — 기본 모드에서만 블러 */}
           <div
-            onClick={() => speak(word.example)}
             style={{
               fontSize: 16,
               fontWeight: 600,
               color: "#333",
               marginBottom: 2,
-              cursor: "pointer",
               lineHeight: 1.45,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              flexWrap: "wrap",
             }}
           >
-            {word.example} <SpeakerIcon size={14} />
+            <span
+              style={
+                hanziSideBlurred
+                  ? { ...blurStyle, display: "inline-block" }
+                  : { cursor: "pointer" }
+              }
+              onClick={() => {
+                if (hanziSideBlurred) onToggleBlurPeek?.();
+                else speak(word.example);
+              }}
+            >
+              {word.example}
+            </span>
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation();
+                speak(word.example);
+              }}
+              style={{ cursor: "pointer", display: "inline-flex", alignItems: "center" }}
+            >
+              <SpeakerIcon size={14} />
+            </span>
           </div>
 
-          <div
-            style={revealExampleExtra ? {} : hidden}
-            onClick={() => !revealExampleExtra && onReveal()}
-          >
-            <div style={{ fontSize: 13, color: "#aaa", marginBottom: 2 }}>{word.exPinyin}</div>
-            <div style={{ fontSize: 14, color: "#666", marginBottom: 0 }}>{word.exMeaning}</div>
-          </div>
-
-          {!showAnswer && (
-            <div style={{ fontSize: 12, color: "#ccc", marginTop: 6, lineHeight: 1.3 }}>
-              탭하여 정답 보기
+          {/* 예문 병음·뜻 — 기본 모드에서는 병음만, 뜻 보기 모드에서는 둘 다 블러 */}
+          {meaningSideBlurred ? (
+            <div style={blurStyle} onClick={() => onToggleBlurPeek?.()}>
+              <div style={{ fontSize: 13, color: "#aaa", marginBottom: 2 }}>{word.exPinyin}</div>
+              <div style={{ fontSize: 14, color: "#666", marginBottom: 0 }}>{word.exMeaning}</div>
             </div>
+          ) : (
+            <>
+              <div
+                style={hanziSideBlurred ? blurStyle : {}}
+                onClick={() => hanziSideBlurred && onToggleBlurPeek?.()}
+              >
+                <div style={{ fontSize: 13, color: "#aaa", marginBottom: 2 }}>{word.exPinyin}</div>
+              </div>
+              <div style={{ fontSize: 14, color: "#666", marginBottom: 0 }}>{word.exMeaning}</div>
+            </>
           )}
         </div>
       )}

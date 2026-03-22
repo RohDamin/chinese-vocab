@@ -7,12 +7,17 @@ export default function HanziBox({
   writeMode = false,
   writeHanziRevealed = false,
   onToggleWriteHanzi,
+  meaningViewActive = false,
+  blurPeek = false,
+  onToggleBlurPeek,
 }) {
-  const hanziBlurred = writeMode && !writeHanziRevealed;
+  const hanziBlurred = writeMode ? !writeHanziRevealed : !meaningViewActive && !blurPeek;
 
   const handleMainClick = () => {
     if (writeMode) {
       onToggleWriteHanzi?.();
+    } else if (!meaningViewActive) {
+      onToggleBlurPeek?.();
     } else {
       speak(hanzi);
     }
@@ -23,7 +28,7 @@ export default function HanziBox({
       onClick={handleMainClick}
       style={{
         background: COLORS.orange,
-        padding: writeMode ? "22px 16px 30px" : "22px 16px",
+        padding: "22px 16px",
         textAlign: "center",
         cursor: "pointer",
         position: "relative",
@@ -42,25 +47,6 @@ export default function HanziBox({
       >
         {hanzi}
       </div>
-
-      {writeMode && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 8,
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            fontSize: 11,
-            fontWeight: 600,
-            color: "rgba(255,255,255,.85)",
-            pointerEvents: "none",
-            textShadow: "0 1px 2px rgba(0,0,0,.2)",
-          }}
-        >
-          {hanziBlurred ? "탭하여 한자 보기" : "탭하여 한자 숨기기"}
-        </div>
-      )}
 
       <div
         role="button"
