@@ -7,11 +7,13 @@ export default function Header({ title, view, doneCount, notCount, onChangeView,
     <div
       style={{
         padding: "12px 20px",
+        paddingTop: "max(12px, env(safe-area-inset-top))",
         background: COLORS.white,
         borderBottom: `1px solid ${COLORS.border}`,
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
+        flexShrink: 0,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

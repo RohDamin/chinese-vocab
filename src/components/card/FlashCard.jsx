@@ -1,4 +1,5 @@
 // components/card/FlashCard.jsx
+import { useRef, useCallback } from "react";
 import { COLORS } from "../../styles/theme";
 import { CheckIcon } from "../icons/Icons";
 import { EmptyState } from "../common/EmptyState";
@@ -8,7 +9,7 @@ import { CardInfo } from "./CardInfo";
 const STATUS_LABELS = [
   { field: "meaning_memorized", label: "뜻 암기", emoji: "📖" },
   { field: "hanzi_written", label: "한자 써봄", emoji: "✏️" },
-  { field: "hanzi_memorized", label: "한자 암기", emoji: "🧠" },
+  { field: "hanzi_memorized", label: "한자 암기", emoji: "🍊" },
 ];
 
 export default function FlashCard({
@@ -23,15 +24,93 @@ export default function FlashCard({
   goTo,
   toggleStatus,
 }) {
+  const swipePointerId = useRef(null);
+  const swipeStartX = useRef(0);
+  const swipeStartY = useRef(0);
+
+  const SWIPE_THRESHOLD = 56;
+
+  const onSwipePointerDown = useCallback((e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    swipePointerId.current = e.pointerId;
+    swipeStartX.current = e.clientX;
+    swipeStartY.current = e.clientY;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const endSwipe = useCallback(
+    (e) => {
+      if (swipePointerId.current === null || e.pointerId !== swipePointerId.current) return;
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+      swipePointerId.current = null;
+
+      const dx = e.clientX - swipeStartX.current;
+      const dy = e.clientY - swipeStartY.current;
+
+      if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+      if (Math.abs(dx) < Math.abs(dy)) return;
+
+      if (dx < 0) goTo("next");
+      else goTo("prev");
+    },
+    [goTo]
+  );
+
+  const onSwipePointerUp = useCallback(
+    (e) => {
+      endSwipe(e);
+    },
+    [endSwipe]
+  );
+
+  const onSwipePointerCancel = useCallback(
+    (e) => {
+      if (swipePointerId.current === null || e.pointerId !== swipePointerId.current) return;
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+      swipePointerId.current = null;
+    },
+    []
+  );
+
   if (filtered.length === 0) {
-    return <EmptyState filter={filter} />;
+    return (
+      <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
+        <EmptyState filter={filter} />
+      </div>
+    );
   }
 
   const wordStatus = statuses[current.id] || {};
 
   return (
-    <>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 20px 0" }}>
+    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "12px 16px 0",
+          touchAction: "none",
+        }}
+        onPointerDown={onSwipePointerDown}
+        onPointerUp={onSwipePointerUp}
+        onPointerCancel={onSwipePointerCancel}
+      >
         <div
           style={{
             width: "100%",
@@ -49,12 +128,13 @@ export default function FlashCard({
         </div>
 
         {/* 암기 상태 3단계 체크 */}
-        <div style={{ display: "flex", gap: 8, marginTop: 14, width: "100%" }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 10, width: "100%" }}>
           {STATUS_LABELS.map(({ field, label, emoji }) => {
             const checked = wordStatus[field] || false;
             return (
               <button
                 key={field}
+                type="button"
                 onClick={() => toggleStatus(current.id, field)}
                 style={{
                   flex: 1,
@@ -62,11 +142,11 @@ export default function FlashCard({
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 5,
-                  padding: "10px 6px",
+                  padding: "8px 4px",
                   borderRadius: 12,
                   border: checked ? "none" : `1.5px solid #ddd`,
                   cursor: "pointer",
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 600,
                   background: checked ? COLORS.green : COLORS.white,
                   color: checked ? COLORS.white : COLORS.textMuted,
@@ -81,43 +161,27 @@ export default function FlashCard({
         </div>
 
         {/* 마지막 변경 시각 */}
-        <div style={{ fontSize: 11, color: COLORS.textHint, marginTop: 6, visibility: wordStatus.updated_at ? "visible" : "hidden" }}>
+        <div style={{ fontSize: 10, color: COLORS.textHint, marginTop: 4, visibility: wordStatus.updated_at ? "visible" : "hidden" }}>
           마지막 업데이트: {wordStatus.updated_at ? new Date(wordStatus.updated_at).toLocaleString("ko-KR") : "-"}
         </div>
       </div>
 
-      {/* 네비게이션 */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", width: "100%" }}>
-        <NavButton direction="prev" onClick={() => goTo("prev")} />
-        <span style={{ fontSize: 13, color: COLORS.textPlaceholder, fontWeight: 500 }}>
-          {currentIdx + 1} / {filtered.length}
-        </span>
-        <NavButton direction="next" onClick={() => goTo("next")} />
+      {/* 진행 + 스와이프 안내 (버튼 없이) */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: "10px 20px max(12px, env(safe-area-inset-bottom))",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontSize: 14, color: COLORS.text, fontWeight: 600 }}>
+          {currentIdx + 1} <span style={{ color: COLORS.textPlaceholder, fontWeight: 500 }}>/</span> {filtered.length}
+        </div>
+        <div style={{ fontSize: 11, color: COLORS.textPlaceholder, marginTop: 4 }}>
+          ← 스와이프로 이전 · 다음 →
+        </div>
       </div>
-    </>
-  );
-}
-
-function NavButton({ direction, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        border: `2px solid ${COLORS.orange}`,
-        background: COLORS.white,
-        color: COLORS.orange,
-        fontSize: 20,
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: 700,
-      }}
-    >
-      {direction === "prev" ? "‹" : "›"}
-    </button>
+    </div>
   );
 }

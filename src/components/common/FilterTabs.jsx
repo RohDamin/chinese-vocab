@@ -9,7 +9,7 @@ export default function FilterTabs({ filter, totalCount, doneCount, notCount, on
   ];
 
   return (
-    <div style={{ display: "flex", gap: 6, padding: "12px 20px", background: COLORS.white }}>
+    <div style={{ display: "flex", gap: 6, padding: "12px 20px", background: COLORS.white, flexShrink: 0 }}>
       {tabs.map(([key, label, count]) => (
         <button
           key={key}

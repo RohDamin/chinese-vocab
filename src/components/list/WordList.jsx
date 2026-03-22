@@ -11,7 +11,7 @@ export default function WordList({ filtered, statuses, filter, onSelect, onToggl
   }
 
   return (
-    <div style={{ flex: 1, overflow: "auto", padding: "8px 16px 20px" }}>
+    <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "8px 16px max(16px, env(safe-area-inset-bottom))" }}>
       {filtered.map((w) => {
         const s = statuses[w.id] || {};
         const doneCount = FIELDS.filter((f) => s[f]).length;

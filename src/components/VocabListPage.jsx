@@ -4,16 +4,24 @@ import { COLORS } from "../styles/theme";
 export default function VocabListPage({ vocabList, loading, onSelect }) {
   if (loading) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", color: "#999" }}>
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", color: "#999" }}>
         불러오는 중...
       </div>
     );
   }
 
   return (
-    <div style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif", maxWidth: 420, margin: "0 auto", minHeight: "100vh", background: COLORS.bg }}>
+    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden", background: COLORS.bg }}>
       {/* 헤더 */}
-      <div style={{ padding: "24px 20px 16px", background: COLORS.white, borderBottom: `1px solid ${COLORS.border}` }}>
+      <div
+        style={{
+          flexShrink: 0,
+          padding: "20px 20px 14px",
+          paddingTop: "max(20px, env(safe-area-inset-top))",
+          background: COLORS.white,
+          borderBottom: `1px solid ${COLORS.border}`,
+        }}
+      >
         <div style={{ fontSize: 22, fontWeight: 700, color: COLORS.text }}>
           中文 단어장
         </div>
@@ -23,7 +31,7 @@ export default function VocabListPage({ vocabList, loading, onSelect }) {
       </div>
 
       {/* 단어장 목록 */}
-      <div style={{ padding: "12px 16px" }}>
+      <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "12px 16px max(12px, env(safe-area-inset-bottom))" }}>
       {(!vocabList || vocabList.length === 0) ? (
           <div style={{ textAlign: "center", padding: 40, color: "#ccc" }}>
             <div style={{ fontSize: 36, marginBottom: 8 }}>📚</div>
