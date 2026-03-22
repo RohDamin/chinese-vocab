@@ -1,7 +1,7 @@
 // components/card/FlashCard.jsx
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useState } from "react";
 import { COLORS } from "../../styles/theme";
-import { CheckIcon } from "../icons/Icons";
+import { CheckIcon, PenIcon } from "../icons/Icons";
 import { EmptyState } from "../common/EmptyState";
 import HanziBox from "./HanziBox";
 import { CardInfo } from "./CardInfo";
@@ -32,8 +32,17 @@ export default function FlashCard({
   const swipePointerId = useRef(null);
   const swipeStartX = useRef(0);
   const swipeStartY = useRef(0);
+  const [writePracticeActive, setWritePracticeActive] = useState(false);
 
   const SWIPE_THRESHOLD = 56;
+
+  const toggleWritePractice = useCallback(() => {
+    setWritePracticeActive((v) => {
+      const next = !v;
+      if (next) setShowAnswer(true);
+      return next;
+    });
+  }, [setShowAnswer]);
 
   const onSwipePointerDown = useCallback((e) => {
     if (e.button !== undefined && e.button !== 0) return;
@@ -107,6 +116,9 @@ export default function FlashCard({
           flexShrink: 0,
           padding: `6px ${CARD_SIDE_PADDING}px 0`,
           background: COLORS.bg,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
         }}
       >
         <button
@@ -134,6 +146,33 @@ export default function FlashCard({
         >
           🎲
         </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleWritePractice();
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          title={writePracticeActive ? "한자쓰기 끄기" : "한자쓰기 (예문 자리에 필기)"}
+          aria-label={writePracticeActive ? "한자쓰기 모드 끄기" : "한자쓰기 모드 켜기"}
+          aria-pressed={writePracticeActive}
+          style={{
+            width: 32,
+            height: 32,
+            padding: 0,
+            borderRadius: 10,
+            border: writePracticeActive ? `2px solid ${COLORS.green}` : `1px solid ${COLORS.border}`,
+            background: writePracticeActive ? COLORS.green : COLORS.white,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: writePracticeActive ? COLORS.white : COLORS.textMuted,
+            boxShadow: writePracticeActive ? "0 2px 6px rgba(46,160,90,.3)" : "0 1px 2px rgba(0,0,0,.06)",
+          }}
+        >
+          <PenIcon size={16} />
+        </button>
       </div>
 
       <div
@@ -146,6 +185,7 @@ export default function FlashCard({
           justifyContent: "center",
           padding: `4px ${CARD_SIDE_PADDING}px 0`,
           touchAction: "none",
+          overflow: "hidden",
         }}
         onPointerDown={onSwipePointerDown}
         onPointerUp={onSwipePointerUp}
@@ -165,7 +205,12 @@ export default function FlashCard({
           }}
         >
           <HanziBox hanzi={current.hanzi} />
-          <CardInfo word={current} showAnswer={showAnswer} onReveal={() => setShowAnswer(true)} />
+          <CardInfo
+            word={current}
+            showAnswer={showAnswer}
+            onReveal={() => setShowAnswer(true)}
+            writePracticeActive={writePracticeActive}
+          />
         </div>
 
         {/* 암기 상태 3단계 체크 */}
