@@ -3,7 +3,7 @@ import { COLORS } from "../../styles/theme";
 import { EmptyState } from "../common/EmptyState";
 
 const FIELDS = ["meaning_memorized", "hanzi_written", "hanzi_memorized"];
-const FIELD_EMOJI = { meaning_memorized: "📖", hanzi_written: "✏️", hanzi_memorized: "🧠" };
+const FIELD_EMOJI = { meaning_memorized: "📖", hanzi_written: "✏️", hanzi_memorized: "🍊" };
 
 export default function WordList({ filtered, statuses, filter, onSelect, onToggle }) {
   if (filtered.length === 0) {
