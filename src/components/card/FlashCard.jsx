@@ -1,7 +1,7 @@
 // components/card/FlashCard.jsx
 import { useRef, useCallback, useState } from "react";
 import { COLORS } from "../../styles/theme";
-import { CheckIcon, PenIcon } from "../icons/Icons";
+import { CheckIcon } from "../icons/Icons";
 import { EmptyState } from "../common/EmptyState";
 import HanziBox from "./HanziBox";
 import { CardInfo } from "./CardInfo";
@@ -132,8 +132,8 @@ export default function FlashCard({
             height: 32,
             padding: 0,
             borderRadius: 10,
-            border: randomSwipeActive ? `2px solid ${COLORS.orange}` : `1px solid ${COLORS.border}`,
-            background: randomSwipeActive ? COLORS.orange : COLORS.white,
+            border: randomSwipeActive ? `2px solid ${COLORS.green}` : `1px solid ${COLORS.border}`,
+            background: randomSwipeActive ? COLORS.green : COLORS.white,
             cursor: "pointer",
             fontSize: 15,
             lineHeight: 1,
@@ -141,7 +141,7 @@ export default function FlashCard({
             alignItems: "center",
             justifyContent: "center",
             color: randomSwipeActive ? COLORS.white : COLORS.textMuted,
-            boxShadow: randomSwipeActive ? "0 2px 6px rgba(245,124,32,.35)" : "0 1px 2px rgba(0,0,0,.06)",
+            boxShadow: randomSwipeActive ? "0 2px 6px rgba(46,160,90,.3)" : "0 1px 2px rgba(0,0,0,.06)",
           }}
         >
           🎲
@@ -171,7 +171,9 @@ export default function FlashCard({
             boxShadow: writePracticeActive ? "0 2px 6px rgba(46,160,90,.3)" : "0 1px 2px rgba(0,0,0,.06)",
           }}
         >
-          <PenIcon size={16} />
+          <span style={{ fontSize: 14, lineHeight: 1 }}>
+            {STATUS_LABELS.find((s) => s.field === "hanzi_written")?.emoji ?? "✏️"}
+          </span>
         </button>
       </div>
 
