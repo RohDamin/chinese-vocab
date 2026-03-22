@@ -1,5 +1,5 @@
 // components/card/FlashCard.jsx
-import { useRef, useCallback, useState } from "react";
+import { useRef, useCallback, useState, useEffect } from "react";
 import { COLORS } from "../../styles/theme";
 import { CheckIcon } from "../icons/Icons";
 import { EmptyState } from "../common/EmptyState";
@@ -33,6 +33,8 @@ export default function FlashCard({
   const swipeStartX = useRef(0);
   const swipeStartY = useRef(0);
   const [writePracticeActive, setWritePracticeActive] = useState(false);
+  /** 쓰기 모드에서 한자 블러 해제 여부 (false면 블러) */
+  const [writeHanziRevealed, setWriteHanziRevealed] = useState(false);
 
   const SWIPE_THRESHOLD = 56;
 
@@ -43,6 +45,14 @@ export default function FlashCard({
       return next;
     });
   }, [setShowAnswer]);
+
+  useEffect(() => {
+    setWriteHanziRevealed(false);
+  }, [current?.id]);
+
+  useEffect(() => {
+    if (!writePracticeActive) setWriteHanziRevealed(false);
+  }, [writePracticeActive]);
 
   const onSwipePointerDown = useCallback((e) => {
     if (e.button !== undefined && e.button !== 0) return;
@@ -206,7 +216,12 @@ export default function FlashCard({
             transform: animDir === "next" ? "translateX(-30px)" : animDir === "prev" ? "translateX(30px)" : "none",
           }}
         >
-          <HanziBox hanzi={current.hanzi} />
+          <HanziBox
+            hanzi={current.hanzi}
+            writeMode={writePracticeActive}
+            writeHanziRevealed={writeHanziRevealed}
+            onToggleWriteHanzi={() => setWriteHanziRevealed((v) => !v)}
+          />
           <CardInfo
             word={current}
             showAnswer={showAnswer}
