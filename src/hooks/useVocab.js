@@ -1,5 +1,5 @@
 // hooks/useVocab.js
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { fetchVocabList, fetchWords } from "../utils/sheets";
 import { loadStatuses, updateStatus } from "../utils/supabase";
 
@@ -19,6 +19,10 @@ export function useVocab() {
   const [view, setView] = useState("card");
   const [loading, setLoading] = useState(true);
   const [animDir, setAnimDir] = useState(null);
+  /** 🎲 활성화 시 스와이프할 때마다 무작위 카드로 이동 */
+  const [randomSwipeActive, setRandomSwipeActive] = useState(false);
+  const randomSwipeRef = useRef(false);
+  randomSwipeRef.current = randomSwipeActive;
 
   // 1) 앱 시작: 단어장 목록 로드
   useEffect(() => {
@@ -40,6 +44,7 @@ export function useVocab() {
     setLoading(true);
     setCurrentIdx(0);
     setShowAnswer(false);
+    setRandomSwipeActive(false);
     setFilter("all");
     setView("card");
 
@@ -62,6 +67,7 @@ export function useVocab() {
     setWords([]);
     setStatuses({});
     setCurrentIdx(0);
+    setRandomSwipeActive(false);
   }, []);
 
   // 필터링
@@ -83,18 +89,30 @@ export function useVocab() {
   // 카드 이동
   const goTo = useCallback(
     (dir) => {
+      const len = filtered.length;
       setAnimDir(dir);
       setTimeout(() => {
         setShowAnswer(false);
         setCurrentIdx((i) => {
-          if (dir === "next") return i < filtered.length - 1 ? i + 1 : 0;
-          return i > 0 ? i - 1 : filtered.length - 1;
+          if (randomSwipeRef.current && len > 1) {
+            let j;
+            do {
+              j = Math.floor(Math.random() * len);
+            } while (j === i);
+            return j;
+          }
+          if (dir === "next") return i < len - 1 ? i + 1 : 0;
+          return i > 0 ? i - 1 : len - 1;
         });
         setAnimDir(null);
       }, 200);
     },
     [filtered.length]
   );
+
+  const toggleRandomSwipe = useCallback(() => {
+    setRandomSwipeActive((v) => !v);
+  }, []);
 
   // 상태 토글 (field = "meaning_memorized" | "hanzi_written" | "hanzi_memorized")
   const toggleStatus = useCallback(
@@ -174,6 +192,8 @@ export function useVocab() {
 
     // 액션
     goTo,
+    randomSwipeActive,
+    toggleRandomSwipe,
     toggleStatus,
     changeFilter,
     changeView,

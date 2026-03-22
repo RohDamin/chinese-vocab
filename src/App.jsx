@@ -27,6 +27,8 @@ export default function App() {
     doneCount,
     notCount,
     goTo,
+    randomSwipeActive,
+    toggleRandomSwipe,
     toggleStatus,
     changeFilter,
     changeView,
@@ -89,7 +91,7 @@ export default function App() {
         onChange={changeFilter}
       />
 
-      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden", background: COLORS.bg }}>
         {view === "card" ? (
           <FlashCard
             filtered={filtered}
@@ -101,6 +103,8 @@ export default function App() {
             statuses={statuses}
             filter={filter}
             goTo={goTo}
+            randomSwipeActive={randomSwipeActive}
+            toggleRandomSwipe={toggleRandomSwipe}
             toggleStatus={toggleStatus}
           />
         ) : (

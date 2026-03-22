@@ -22,6 +22,8 @@ export default function FlashCard({
   statuses,
   filter,
   goTo,
+  randomSwipeActive,
+  toggleRandomSwipe,
   toggleStatus,
 }) {
   const swipePointerId = useRef(null);
@@ -95,7 +97,42 @@ export default function FlashCard({
   const wordStatus = statuses[current.id] || {};
 
   return (
-    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden", background: COLORS.bg }}>
+      {/* 탭 아래 회색 영역: 랜덤만 (상단 흰 영역 높이 불변) */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: "6px 16px 0",
+          background: COLORS.bg,
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => toggleRandomSwipe()}
+          title={randomSwipeActive ? "스와이프 무작위 끄기" : "스와이프 무작위 켜기"}
+          aria-label={randomSwipeActive ? "스와이프 무작위 모드 끄기" : "스와이프 무작위 모드 켜기"}
+          aria-pressed={randomSwipeActive}
+          style={{
+            width: 32,
+            height: 32,
+            padding: 0,
+            borderRadius: 10,
+            border: randomSwipeActive ? `2px solid ${COLORS.orange}` : `1px solid ${COLORS.border}`,
+            background: randomSwipeActive ? COLORS.orange : COLORS.white,
+            cursor: "pointer",
+            fontSize: 15,
+            lineHeight: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: randomSwipeActive ? COLORS.white : COLORS.textMuted,
+            boxShadow: randomSwipeActive ? "0 2px 6px rgba(245,124,32,.35)" : "0 1px 2px rgba(0,0,0,.06)",
+          }}
+        >
+          🎲
+        </button>
+      </div>
+
       <div
         style={{
           flex: 1,
@@ -104,7 +141,7 @@ export default function FlashCard({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "12px 16px 0",
+          padding: "4px 16px 0",
           touchAction: "none",
         }}
         onPointerDown={onSwipePointerDown}
@@ -166,7 +203,7 @@ export default function FlashCard({
         </div>
       </div>
 
-      {/* 진행 + 스와이프 안내 (버튼 없이) */}
+      {/* 진행 + 스와이프 안내 */}
       <div
         style={{
           flexShrink: 0,
@@ -179,7 +216,7 @@ export default function FlashCard({
           {currentIdx + 1} <span style={{ color: COLORS.textPlaceholder, fontWeight: 500 }}>/</span> {filtered.length}
         </div>
         <div style={{ fontSize: 11, color: COLORS.textPlaceholder, marginTop: 4 }}>
-          ← 스와이프로 이전 · 다음 →
+          {randomSwipeActive ? "← 스와이프할 때마다 무작위 카드 →" : "← 스와이프로 이전 · 다음 →"}
         </div>
       </div>
     </div>
