@@ -26,6 +26,8 @@ export default function App() {
     animDir,
     doneCount,
     notCount,
+    meaningNotCount,
+    hanziMemNotCount,
     goTo,
     randomSwipeActive,
     toggleRandomSwipe,
@@ -86,8 +88,9 @@ export default function App() {
       <FilterTabs
         filter={filter}
         totalCount={words.length}
+        meaningNotCount={meaningNotCount}
+        hanziMemNotCount={hanziMemNotCount}
         doneCount={doneCount}
-        notCount={notCount}
         onChange={changeFilter}
       />
 

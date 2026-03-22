@@ -78,8 +78,11 @@ export function useVocab() {
     if (filter === "done") {
       return s && STATUS_FIELDS.every((f) => s[f]);
     }
-    if (filter === "not") {
-      return !s || !STATUS_FIELDS.every((f) => s[f]);
+    if (filter === "meaning_not") {
+      return !s?.meaning_memorized;
+    }
+    if (filter === "hanzi_not") {
+      return !s?.hanzi_memorized;
     }
     return true;
   });
@@ -165,6 +168,10 @@ export function useVocab() {
     return s && STATUS_FIELDS.every((f) => s[f]);
   }).length;
   const notCount = words.length - doneCount;
+  /** 뜻 암기 미완료 */
+  const meaningNotCount = words.filter((w) => !statuses[w.id]?.meaning_memorized).length;
+  /** 한자 암기 미완료 */
+  const hanziMemNotCount = words.filter((w) => !statuses[w.id]?.hanzi_memorized).length;
 
   return {
     // 단어장 목록
@@ -189,6 +196,8 @@ export function useVocab() {
     // 통계
     doneCount,
     notCount,
+    meaningNotCount,
+    hanziMemNotCount,
 
     // 액션
     goTo,
