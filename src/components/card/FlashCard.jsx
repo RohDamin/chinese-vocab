@@ -6,6 +6,9 @@ import { EmptyState } from "../common/EmptyState";
 import HanziBox from "./HanziBox";
 import { CardInfo } from "./CardInfo";
 
+/** 카드·스와이프 영역 좌우 여백 (px) */
+const CARD_SIDE_PADDING = 24;
+
 const STATUS_LABELS = [
   { field: "meaning_memorized", label: "뜻 암기", emoji: "📖" },
   { field: "hanzi_written", label: "한자 써봄", emoji: "✏️" },
@@ -102,7 +105,7 @@ export default function FlashCard({
       <div
         style={{
           flexShrink: 0,
-          padding: "6px 16px 0",
+          padding: `6px ${CARD_SIDE_PADDING}px 0`,
           background: COLORS.bg,
         }}
       >
@@ -141,7 +144,7 @@ export default function FlashCard({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "4px 16px 0",
+          padding: `4px ${CARD_SIDE_PADDING}px 0`,
           touchAction: "none",
         }}
         onPointerDown={onSwipePointerDown}
@@ -151,8 +154,9 @@ export default function FlashCard({
         <div
           style={{
             width: "100%",
+            maxWidth: 340,
             background: COLORS.white,
-            borderRadius: 20,
+            borderRadius: 18,
             boxShadow: COLORS.cardShadow,
             overflow: "hidden",
             transition: "opacity .2s, transform .2s",
@@ -165,7 +169,7 @@ export default function FlashCard({
         </div>
 
         {/* 암기 상태 3단계 체크 */}
-        <div style={{ display: "flex", gap: 8, marginTop: 10, width: "100%" }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 10, width: "100%", maxWidth: 340 }}>
           {STATUS_LABELS.map(({ field, label, emoji }) => {
             const checked = wordStatus[field] || false;
             return (
@@ -203,20 +207,17 @@ export default function FlashCard({
         </div>
       </div>
 
-      {/* 진행 + 스와이프 안내 */}
+      {/* 진행 안내 */}
       <div
         style={{
           flexShrink: 0,
-          padding: "10px 20px max(12px, env(safe-area-inset-bottom))",
+          padding: `10px ${CARD_SIDE_PADDING}px max(12px, env(safe-area-inset-bottom))`,
           width: "100%",
           textAlign: "center",
         }}
       >
         <div style={{ fontSize: 14, color: COLORS.text, fontWeight: 600 }}>
           {currentIdx + 1} <span style={{ color: COLORS.textPlaceholder, fontWeight: 500 }}>/</span> {filtered.length}
-        </div>
-        <div style={{ fontSize: 11, color: COLORS.textPlaceholder, marginTop: 4 }}>
-          {randomSwipeActive ? "← 스와이프할 때마다 무작위 카드 →" : "← 스와이프로 이전 · 다음 →"}
         </div>
       </div>
     </div>

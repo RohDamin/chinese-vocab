@@ -8,20 +8,20 @@ export default function HanziBox({ hanzi }) {
       onClick={() => speak(hanzi)}
       style={{
         background: COLORS.orange,
-        padding: "28px 20px",
+        padding: "22px 16px",
         textAlign: "center",
         cursor: "pointer",
         position: "relative",
       }}
     >
-      <div style={{ fontSize: 48, fontWeight: 700, color: COLORS.white, letterSpacing: 4 }}>
+      <div style={{ fontSize: 42, fontWeight: 700, color: COLORS.white, letterSpacing: 3 }}>
         {hanzi}
       </div>
       <div
         style={{
           position: "absolute",
-          top: 12,
-          right: 14,
+          top: 10,
+          right: 12,
           background: "rgba(255,255,255,.25)",
           borderRadius: 20,
           padding: "4px 8px",
