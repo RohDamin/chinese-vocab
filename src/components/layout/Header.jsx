@@ -2,11 +2,11 @@
 import { COLORS } from "../../styles/theme";
 import { CardIcon, ListIcon } from "../icons/Icons";
 
-export default function Header({ view, memCount, notCount, onChangeView }) {
+export default function Header({ title, view, doneCount, notCount, onChangeView, onBack }) {
   return (
     <div
       style={{
-        padding: "16px 20px",
+        padding: "12px 20px",
         background: COLORS.white,
         borderBottom: `1px solid ${COLORS.border}`,
         display: "flex",
@@ -14,22 +14,39 @@ export default function Header({ view, memCount, notCount, onChangeView }) {
         alignItems: "center",
       }}
     >
-      <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.text }}>
-        中文 단어장
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {/* 뒤로가기 */}
+        <button
+          onClick={onBack}
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: 17,
+            border: `1.5px solid ${COLORS.border}`,
+            background: COLORS.white,
+            color: COLORS.textMuted,
+            fontSize: 18,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          ‹
+        </button>
+        <div style={{ fontSize: 18, fontWeight: 700, color: COLORS.text }}>{title}</div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        {/* 통계 배지 */}
-        <div style={{ display: "flex", gap: 12, fontSize: 13 }}>
+        <div style={{ display: "flex", gap: 8, fontSize: 13 }}>
           <span style={{ background: COLORS.greenBg, color: COLORS.green, padding: "3px 10px", borderRadius: 20, fontWeight: 600 }}>
-            {memCount}
+            {doneCount}
           </span>
           <span style={{ background: COLORS.redBg, color: COLORS.red, padding: "3px 10px", borderRadius: 20, fontWeight: 600 }}>
             {notCount}
           </span>
         </div>
 
-        {/* 뷰 토글 */}
         <div style={{ display: "flex", gap: 4, background: COLORS.inputBg, borderRadius: 10, padding: 3 }}>
           <ViewToggleBtn active={view === "card"} onClick={() => onChangeView("card")}>
             <CardIcon />

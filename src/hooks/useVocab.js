@@ -1,35 +1,80 @@
 // hooks/useVocab.js
 import { useState, useEffect, useCallback } from "react";
-import { INITIAL_WORDS } from "../data/words";
-import { loadStatuses, saveStatuses as persistStatuses } from "../utils/storage";
+import { fetchVocabList, fetchWords } from "../utils/sheets";
+import { loadStatuses, updateStatus } from "../utils/supabase";
 
 export function useVocab() {
-  const [words] = useState(INITIAL_WORDS);
+  // 단어장 목록
+  const [vocabList, setVocabList] = useState([]);
+  const [selectedVocab, setSelectedVocab] = useState(null); // { id, name, description }
+
+  // 단어 & 상태
+  const [words, setWords] = useState([]);
   const [statuses, setStatuses] = useState({});
+
+  // UI 상태
   const [currentIdx, setCurrentIdx] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [filter, setFilter] = useState("all");
   const [view, setView] = useState("card");
-  const [loaded, setLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [animDir, setAnimDir] = useState(null);
 
-  // 초기 로드
+  // 1) 앱 시작: 단어장 목록 로드
   useEffect(() => {
-    setStatuses(loadStatuses());
-    setLoaded(true);
-    window.speechSynthesis.getVoices(); // TTS 음성 목록 미리 로드
+    (async () => {
+      try {
+        const list = await fetchVocabList();
+        setVocabList(list);
+      } catch (e) {
+        console.error("Failed to load vocab list:", e);
+      }
+      setLoading(false);
+    })();
+    window.speechSynthesis.getVoices();
   }, []);
 
-  // 저장
-  const saveStatuses = useCallback((s) => {
-    setStatuses(s);
-    persistStatuses(s);
+  // 2) 단어장 선택 시: 단어 + 상태 로드
+  const selectVocab = useCallback(async (vocab) => {
+    setSelectedVocab(vocab);
+    setLoading(true);
+    setCurrentIdx(0);
+    setShowAnswer(false);
+    setFilter("all");
+    setView("card");
+
+    try {
+      const [wordData, statusData] = await Promise.all([
+        fetchWords(vocab.name),
+        loadStatuses(vocab.name),
+      ]);
+      setWords(wordData);
+      setStatuses(statusData);
+    } catch (e) {
+      console.error("Failed to load vocab:", e);
+    }
+    setLoading(false);
   }, []);
 
-  // 필터링된 단어 목록
+  // 단어장 목록으로 돌아가기
+  const goBack = useCallback(() => {
+    setSelectedVocab(null);
+    setWords([]);
+    setStatuses({});
+    setCurrentIdx(0);
+  }, []);
+
+  // 필터링
+  const STATUS_FIELDS = ["meaning_memorized", "hanzi_written", "hanzi_memorized"];
+
   const filtered = words.filter((w) => {
-    if (filter === "memorized") return statuses[w.id] === "memorized";
-    if (filter === "not") return statuses[w.id] !== "memorized";
+    const s = statuses[w.id];
+    if (filter === "done") {
+      return s && STATUS_FIELDS.every((f) => s[f]);
+    }
+    if (filter === "not") {
+      return !s || !STATUS_FIELDS.every((f) => s[f]);
+    }
     return true;
   });
 
@@ -51,18 +96,26 @@ export function useVocab() {
     [filtered.length]
   );
 
-  // 암기 상태 토글
+  // 상태 토글 (field = "meaning_memorized" | "hanzi_written" | "hanzi_memorized")
   const toggleStatus = useCallback(
-    (id) => {
-      const next = { ...statuses };
-      if (next[id] === "memorized") {
-        delete next[id];
-      } else {
-        next[id] = "memorized";
-      }
-      saveStatuses(next);
+    async (wordId, field) => {
+      const current = statuses[wordId]?.[field] || false;
+      const newValue = !current;
+
+      // 낙관적 업데이트 (UI 먼저 반영)
+      setStatuses((prev) => ({
+        ...prev,
+        [wordId]: {
+          ...prev[wordId],
+          [field]: newValue,
+          updated_at: new Date().toISOString(),
+        },
+      }));
+
+      // Supabase에 저장
+      await updateStatus(selectedVocab.name, wordId, field, newValue);
     },
-    [statuses, saveStatuses]
+    [statuses, selectedVocab]
   );
 
   // 필터/뷰 변경
@@ -78,32 +131,48 @@ export function useVocab() {
     setShowAnswer(false);
   }, []);
 
-  // 리스트에서 카드로 이동
-  const goToCard = useCallback((wordId) => {
-    const idx = filtered.findIndex((f) => f.id === wordId);
-    setCurrentIdx(idx >= 0 ? idx : 0);
-    setShowAnswer(false);
-    setView("card");
-  }, [filtered]);
+  const goToCard = useCallback(
+    (wordId) => {
+      const idx = filtered.findIndex((f) => f.id === wordId);
+      setCurrentIdx(idx >= 0 ? idx : 0);
+      setShowAnswer(false);
+      setView("card");
+    },
+    [filtered]
+  );
 
   // 통계
-  const memCount = words.filter((w) => statuses[w.id] === "memorized").length;
-  const notCount = words.length - memCount;
+  const doneCount = words.filter((w) => {
+    const s = statuses[w.id];
+    return s && STATUS_FIELDS.every((f) => s[f]);
+  }).length;
+  const notCount = words.length - doneCount;
 
   return {
+    // 단어장 목록
+    vocabList,
+    selectedVocab,
+    selectVocab,
+    goBack,
+
+    // 단어 & 상태
     words,
     filtered,
     current,
     currentIdx,
+    statuses,
     showAnswer,
     setShowAnswer,
     filter,
     view,
-    loaded,
+    loading,
     animDir,
-    statuses,
-    memCount,
+
+    // 통계
+    doneCount,
     notCount,
+
+    // 액션
     goTo,
     toggleStatus,
     changeFilter,

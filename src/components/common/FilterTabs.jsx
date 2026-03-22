@@ -1,10 +1,11 @@
+// components/common/FilterTabs.jsx
 import { COLORS } from "../../styles/theme";
 
-export default function FilterTabs({ filter, totalCount, memCount, notCount, onChange }) {
+export default function FilterTabs({ filter, totalCount, doneCount, notCount, onChange }) {
   const tabs = [
     ["all", "전체", totalCount],
-    ["not", "미암기", notCount],
-    ["memorized", "암기완료", memCount],
+    ["not", "학습중", notCount],
+    ["done", "완료", doneCount],
   ];
 
   return (

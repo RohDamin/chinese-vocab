@@ -1,8 +1,15 @@
+// components/card/FlashCard.jsx
 import { COLORS } from "../../styles/theme";
-import { CheckIcon, XIcon } from "../icons/Icons";
+import { CheckIcon } from "../icons/Icons";
 import { EmptyState } from "../common/EmptyState";
 import HanziBox from "./HanziBox";
 import { CardInfo } from "./CardInfo";
+
+const STATUS_LABELS = [
+  { field: "meaning_memorized", label: "뜻 암기", emoji: "📖" },
+  { field: "hanzi_written", label: "한자 써봄", emoji: "✏️" },
+  { field: "hanzi_memorized", label: "한자 암기", emoji: "🧠" },
+];
 
 export default function FlashCard({
   filtered,
@@ -20,12 +27,11 @@ export default function FlashCard({
     return <EmptyState filter={filter} />;
   }
 
-  const isMemorized = statuses[current.id] === "memorized";
+  const wordStatus = statuses[current.id] || {};
 
   return (
     <>
-      {/* 카드 영역 */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 20px 0" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 20px 0" }}>
         <div
           style={{
             width: "100%",
@@ -41,36 +47,51 @@ export default function FlashCard({
           <HanziBox hanzi={current.hanzi} />
           <CardInfo word={current} showAnswer={showAnswer} onReveal={() => setShowAnswer(true)} />
         </div>
+
+        {/* 암기 상태 3단계 체크 */}
+        <div style={{ display: "flex", gap: 8, marginTop: 14, width: "100%" }}>
+          {STATUS_LABELS.map(({ field, label, emoji }) => {
+            const checked = wordStatus[field] || false;
+            return (
+              <button
+                key={field}
+                onClick={() => toggleStatus(current.id, field)}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 5,
+                  padding: "10px 6px",
+                  borderRadius: 12,
+                  border: checked ? "none" : `1.5px solid #ddd`,
+                  cursor: "pointer",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  background: checked ? COLORS.green : COLORS.white,
+                  color: checked ? COLORS.white : COLORS.textMuted,
+                  transition: "all .2s",
+                }}
+              >
+                {checked ? <CheckIcon /> : <span style={{ fontSize: 14 }}>{emoji}</span>}
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 마지막 변경 시각 */}
+        <div style={{ fontSize: 11, color: COLORS.textHint, marginTop: 6, visibility: wordStatus.updated_at ? "visible" : "hidden" }}>
+          마지막 업데이트: {wordStatus.updated_at ? new Date(wordStatus.updated_at).toLocaleString("ko-KR") : "-"}
+        </div>
       </div>
 
-      {/* 하단 네비게이션 */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", width: "100%" }}>
+      {/* 네비게이션 */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", width: "100%" }}>
         <NavButton direction="prev" onClick={() => goTo("prev")} />
-
-        <button
-          onClick={() => toggleStatus(current.id)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "8px 16px",
-            borderRadius: 20,
-            border: "none",
-            cursor: "pointer",
-            fontSize: 13,
-            fontWeight: 600,
-            background: isMemorized ? COLORS.green : COLORS.inputBg,
-            color: isMemorized ? COLORS.white : COLORS.textMuted,
-            transition: "all .2s",
-          }}
-        >
-          {isMemorized ? <><CheckIcon /> 암기완료</> : <><XIcon /> 미암기</>}
-        </button>
-
         <span style={{ fontSize: 13, color: COLORS.textPlaceholder, fontWeight: 500 }}>
           {currentIdx + 1} / {filtered.length}
         </span>
-
         <NavButton direction="next" onClick={() => goTo("next")} />
       </div>
     </>
